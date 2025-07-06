@@ -1,0 +1,10 @@
+# Ignore node_modules only inside templates/script
+/templates/script/node_modules/
+
+# Go build artifacts
+*.exe
+*.out
+*.test
+/build/
+/bin/
+main
