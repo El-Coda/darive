@@ -14,7 +14,26 @@
             <button type="submit">upload</button>
         </form>
         <div id="message"></div>
-        <a href="/download/Pictures">dude</a>
+        <form hx-post="/download-selected" hx-target="#download-area" hx-swap="innerHTML">
+            <div class="file-grid">
+                {{ range .Files }}
+                    <div class="file">
+                        <input type="checkbox" name="file_paths" value="{{ .Path }}">
+                        {{ if .IsDir }}
+                            📁 <a href="open?path={{ .Path }}">{{ .Name }}</a>
+                        {{ else }}
+                            📄 {{ .Name }}
+                        {{ end }}
+                        <a href="/download/{{ .Path }}">Download</a>
+                    </div>
+                {{ else }}
+                    <p>No files found.</p>
+                {{ end }}
+            </div>
+            <button type="submit">Download Selected</button>
+        </form>
+
+        <div id="download-area"></div>
     </body>
 </html>
 {{ end }}
