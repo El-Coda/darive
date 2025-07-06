@@ -1,6 +1,7 @@
 # Ignore node_modules only inside templates/script
 /templates/script/node_modules/
 /uploads
+/tmp
 
 # Go build artifacts
 *.exe
