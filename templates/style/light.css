@@ -1,0 +1,142 @@
+.choose-btn {
+    background-color: #458588; 
+    color: white;
+    padding: 25px 25px;
+    border: none;
+    border-radius: 25px; /* Rounded corners */
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+}
+
+#upload-form {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    max-width: 300px;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+}
+
+#file-form {
+    max-width: 80%;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+
+#file-grid {
+ display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 3px;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+#upload-btn {
+  background-color: #28a745;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+#upload-btn:hover {
+  background-color: #1e7e34;
+}
+
+.file {
+    position: relative; /* For positioning the checkbox */
+    padding: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-size: 14px;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    text-align: center;
+    border-radius: 6px;
+    cursor: pointer;
+    overflow: hidden;           /* Prevent content from spilling */
+    word-wrap: break-word;
+}
+
+.file-label {
+    margin-top: 10px;
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.file-rename-container {
+    
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.rename-input {
+    display: none;
+    font-size: 14px;
+    padding: 2px 4px;
+    width: 90px;
+}
+
+/* Tiny edit button */
+.rename-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 5px;
+    font-size: 14px;
+}
+
+/* Show rename button on hover */
+.file:hover .rename-btn {
+    display: inline;
+}
+
+.file-checkbox {
+    appearance: none;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #007bff;
+    border-radius: 50%;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.file-checkbox:checked {
+    background-color: #007bff;
+}
+
+/* Optional checkmark inside */
+.file-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+}
+

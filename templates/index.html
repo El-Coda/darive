@@ -1,4 +1,29 @@
-{{ block "index" . }}
+{{ define "fileGrid" }}
+    <button type="submit">Download Selected</button>
+    <div id="file-grid">
+        {{ range .Files }}
+            <div hx-get="open?path={{ .Path }}" hx-target="#file-form" hx-trigger="dblclick" class="file">
+                <a href="/download/{{ .Path }}">󰇚</a>
+                <input type="checkbox" class="file-checkbox" name="file_paths" value="{{ .Path }}">
+                <div class="file-rename-container">
+                    {{ if .IsDir }}
+                        <p>📁 </p>
+                        <a href="open?path={{ .Path }}">{{ .Name }}</a>
+                    {{ else }}
+                        <p>📄</p>
+                        <span class=file-label>{{ .Name }}</span>
+                    {{ end }}
+                    <input type="text" class="rename-input" value="{{ .Name }}" />
+                    <button class="rename-btn" type="button" title="Rename">✏️</button>
+                </div>
+            </div>
+        {{ else }}
+            <p>No files found.</p>
+        {{ end }}
+    </div>
+{{ end }}
+
+{{ define "index" }}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -8,32 +33,21 @@
         <link href="css/style.css" rel="stylesheet">
     </head>
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.5/dist/htmx.min.js"></script>
+    <link rel="stylesheet" href="style/light.css">
     <body>
-        <form id="form" hx-encoding="multipart/form-data" hx-target="#message" hx-post="/upload">
-            <input type="file" name="files" webkitdirectory mozdirectory multiple>
-            <button type="submit">upload</button>
+        <form id="upload-form" hx-encoding="multipart/form-data" hx-target="#message" hx-post="/upload">
+            <input id="upload-dir" type="file" name="files " webkitdirectory mozdirectory multiple>
+            <label for="upload-dir" class="choose-btn" ></label><br>
+            <input id="upload-file"  type="file" name="files" multiple>
+            <label for="upload-file" class="choose-btn"></label><br>
+            <button id="upload-btn" type="submit">upload</button>
         </form>
         <div id="message"></div>
-        <form hx-post="/download-selected" hx-target="#download-area" hx-swap="innerHTML">
-            <div class="file-grid">
-                {{ range .Files }}
-                    <div class="file">
-                        <input type="checkbox" name="file_paths" value="{{ .Path }}">
-                        {{ if .IsDir }}
-                            📁 <a href="open?path={{ .Path }}">{{ .Name }}</a>
-                        {{ else }}
-                            📄 {{ .Name }}
-                        {{ end }}
-                        <a href="/download/{{ .Path }}">Download</a>
-                    </div>
-                {{ else }}
-                    <p>No files found.</p>
-                {{ end }}
-            </div>
-            <button type="submit">Download Selected</button>
+        <form id="file-form" hx-post="/download-selected" hx-target="#download-area" hx-swap="innerHTML">
+            {{ template "fileGrid" . }}
         </form>
-
-        <div id="download-area"></div>
+            <div id="download-area"></div>
     </body>
 </html>
 {{ end }}
+

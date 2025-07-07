@@ -23,9 +23,11 @@ type File struct {
 
 func main() {
 	http.HandleFunc("/", index)
-	http.HandleFunc("/open", index)
+	http.HandleFunc("/open", open)
 	http.HandleFunc("/upload", upload)
 	http.HandleFunc("/download/", download)
+	http.Handle("/style/", http.StripPrefix("/style/", http.FileServer(http.Dir("templates/style"))))
+	http.Handle("/script/", http.StripPrefix("/script/", http.FileServer(http.Dir("templates/script"))))
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
 
@@ -55,15 +57,49 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var indexTempl = template.Must(template.ParseFiles("templates/index.html"))
-	err = indexTempl.Execute(w, data)
+	err = indexTempl.ExecuteTemplate(w, "index", data)
 	if err != nil {
 		panic(err)
 	}
 }
 
+func open(w http.ResponseWriter, r *http.Request) {
+	dirPath := "./uploads/"
+	path := r.URL.Query().Get("path")
+	fmt.Println(path)
+	entries, err := os.ReadDir(dirPath + path)
+	if err != nil {
+		http.Error(w, "unable to read files", http.StatusInternalServerError)
+		return
+	}
+
+	var files []File
+	for _, entry := range entries {
+		files = append(files, File{
+			Name:  entry.Name(),
+			Path:  filepath.Join(path, entry.Name()), // Just the name relative to current dir
+			IsDir: entry.IsDir(),
+		})
+	}
+
+	data := struct {
+		Files []File
+	}{
+		Files: files,
+	}
+
+	openTempl := template.Must(template.ParseFiles("templates/index.html"))
+	err = openTempl.ExecuteTemplate(w, "fileGrid", data)
+	if err != nil {
+		panic(err)
+	}
+}
+
+// TODO: use /uploads as a root from the os library
 func download(w http.ResponseWriter, r *http.Request) {
 	uri := filepath.Join("./uploads", strings.TrimPrefix(r.URL.Path, "/download/"))
-	fmt.Println(uri)
+	dir := strings.Split(uri, "/")
+	name := dir[len(dir)-1]
 	info, err := os.Stat(uri)
 	if err != nil {
 		http.Error(w, "file not found", http.StatusNotFound)
@@ -115,13 +151,12 @@ func download(w http.ResponseWriter, r *http.Request) {
 			pipew.CloseWithError(err)
 		}()
 		w.Header().Set("Content-Type", "application/zip")
-		w.Header().Set("Content-Disposition", "attachment; filename=\""+folder.Name()+".zip+\"")
+		w.Header().Set("Content-Disposition", "attachment; filename=\""+name+".zip\"")
 		_, err = io.Copy(w, piper)
 		if err != nil {
 			fmt.Println("failed to stream the zip", err)
 		}
 	} else {
-		fmt.Println(uri)
 		file, err := os.Open(uri)
 		if err != nil {
 			http.Error(w, "File not found", http.StatusNotFound)
@@ -129,7 +164,7 @@ func download(w http.ResponseWriter, r *http.Request) {
 		}
 		defer file.Close()
 		w.Header().Set("Content-Type", "application/octet-stream")
-		w.Header().Set("Content-Disposition", "attachment; filename=\""+file.Name()+"\"")
+		w.Header().Set("Content-Disposition", "attachment; filename=\""+name+"\"")
 		http.ServeFile(w, r, uri)
 	}
 }
